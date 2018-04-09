@@ -213,33 +213,44 @@
                             $search_query = $search_query + $c_arr;
                         }
                         
-                        // фильтр по типу документов - taxonomy
-                        if ($document_type_val != null) {
-                            $c_arr = 
-	                            array(
-	                                'tax_query' => array(
-	                                        array (
-	                                            'taxonomy' => 'document_types',
-	                                            'field' => 'term_id',
-	                                            'terms' => $document_type_val,
-	                                        )
-	                                )
-	                            );
-                            $search_query = $search_query + $c_arr;
-                        }
+                        // фильтр по taxonomy (несколько)
+			if  (($document_type_val != null) || ($dc_izdateli != null)) {
+                            $c_arr = null;
 
-                        // фильтр по издателю документов - taxonomy
-                        if ($dc_izdateli != null) {
-                        	$c_arr = array(
-                                'tax_query' => array(
-                                        array (
-                                            'taxonomy' => 'document_izdateli',
-                                            'field' => 'term_id',
-                                            'terms' => $dc_izdateli,
-                                        )
+                            $c_1 = null;
+                            $c_2 = null;
+
+                            if ($document_type_val != null) {
+                                $c_1 = 
+                                    array(
+                                        'taxonomy'      =>      'document_types',
+                                        'field'         =>      'term_id',
+                                        'terms'         =>      $document_type_val
+                                    );
+                            }
+
+                            if ($dc_izdateli != null) {
+                                $c_2 =
+                                    array(
+                                        'taxonomy'      =>      'document_izdateli',
+                                        'field'         =>      'term_id',
+                                        'terms'         =>      $dc_izdateli
+                                    );
+                            }
+
+                            $c_arr = array(
+                                array(
+                                    'relation'          =>      'AND',
+                                    $c_1,
+                                    $c_2
                                 )
                             );
-                            $search_query = $search_query + $c_arr;
+                            $c_pre = 
+                                array(
+                                    'tax_query'         =>      $c_arr
+                                );
+
+                            $search_query = $search_query + $c_pre;
                         }
 
                         // фильтр по дате публикации - custom field
